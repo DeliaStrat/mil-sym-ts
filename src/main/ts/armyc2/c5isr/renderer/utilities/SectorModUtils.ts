@@ -1,8 +1,8 @@
 import { ErrorLogger } from './ErrorLogger';
 import { RendererUtilities } from './RendererUtilities';
 
-import jsond from '../../data/smd.json';
-import jsone from '../../data/sme.json';
+import jsond from '../../data-light/smd.json';
+import jsone from '../../data-light/sme.json';
 import { SymbolID } from './SymbolID';
 
 /**

@@ -5,10 +5,10 @@ import { SymbolID } from "../../renderer/utilities/SymbolID"
 import { ErrorLogger } from "./ErrorLogger";
 import { RendererUtilities } from "./RendererUtilities";
 
-import jsond from '../../data/svgd.json';
-import jsone from '../../data/svge.json';
 import json6d from '../../data/svg6d.json';
 import json6e from '../../data/svg6e.json';
+import jsond from '../../data-light/svgd.json';
+import jsone from '../../data-light/svge.json';
 
 export class SVGLookup
 {

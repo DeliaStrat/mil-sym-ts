@@ -1,7 +1,7 @@
 import { ErrorLogger } from './ErrorLogger';
 import { RendererUtilities } from './RendererUtilities';
 
-import json from '../../data/genc.json';
+import json from '../../data-light/genc.json';
 
 /**
  * Utility class that takes the 3 digit country code from the symbol ID and returns the 3 character string representation

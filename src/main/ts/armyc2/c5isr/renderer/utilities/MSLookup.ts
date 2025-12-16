@@ -6,8 +6,8 @@ import { ErrorLogger } from "./ErrorLogger";
 import { LogLevel } from "./LogLevel";
 import { RendererUtilities } from "./RendererUtilities";
 
-import jsond from '../../data/msd.json';
-import jsone from '../../data/mse.json';
+import jsond from '../../data-light/msd.json';
+import jsone from '../../data-light/mse.json';
 
 /**
  * Class that holds all the  objects with symbol information
