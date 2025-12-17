@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./dist/C5Ren.umd.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      const missions = [
+        // { code: "25270501 25340100", label: "Block" },
+        // { code: "25270503 25341100", label: "Fix" },
+        { prefix: "25", code: "141700", label: "Ambush" },
+        { prefix: "25", code: "270501", label: "Block" },
+        { prefix: "25", code: "340200", label: "Breach" },
+        { prefix: "25", code: "340300", label: "Bypass" },
+        { prefix: "25", code: "340400", label: "Canalize" },
+        { prefix: "25", code: "340500", label: "Clear" },
+        { prefix: "25", code: "151204", label: "Contain" },
+        { prefix: "25", code: "340600", label: "Counter Attack" },
+        { prefix: "25", code: "340700", label: "CATK By Fire" },
+        { prefix: "25", code: "342201", label: "Cover" },
+        { prefix: "25", code: "340900", label: "Destroy" },
+        { prefix: "25", code: "270502", label: "Disrupt" },
+        { prefix: "25", code: "270503", label: "Fix" },
+        { prefix: "25", code: "342202", label: "Guard" },
+        { prefix: "25", code: "341400", label: "Interdict" },
+        { prefix: "25", code: "341500", label: "Isolate" },
+        { prefix: "25", code: "341600", label: "Neutralize" },
+        { prefix: "25", code: "341700", label: "Occupy" },
+        { prefix: "25", code: "151205", label: "Retain" },
+        { prefix: "25", code: "342203", label: "Screen" },
+        { prefix: "25", code: "342100", label: "Secure" },
+        { prefix: "25", code: "342300", label: "Seize" },
+      ];
+
+      function buildSymbolID(basicID) {
+        const version = 13;
+        const context = "0"; // 0-reality
+        const affiliation = "3"; // 3-friendly
+        const basicIdPrefix = basicID.substring(0, 2);
+        const status = "0"; // 0-present
+        const hqtfd = "0"; // 0-unknown
+        const amp = "00"; // 00-unknown
+        const basicIdSuffix = basicID.substring(2); // 6 chars
+        const s1Mod = "00";
+        const s2Mod = "00";
+
+        // extra --------
+        const lbS1 = "0";
+        const lbS2 = "0";
+        // 2525E has frame shape and 4 reserved positions
+        // 2525D has 5 reserved positions
+        const frame = version >= 13 ? "0" + "0000" : "00000";
+        const labels = "000";
+
+        const id = `${version}${context}${affiliation}${basicIdPrefix}${status}${hqtfd}${amp}${basicIdSuffix}${s1Mod}${s2Mod}${lbS1}${lbS2}${frame}${labels}`;
+
+        return id;
+      }
+
+      missions.forEach((mission) => {
+        const symbolId = buildSymbolID(`${mission.prefix}${mission.code}`);
+        const outputGeoJson = C5Ren.WebRenderer.RenderSymbol2D(
+          "ID",
+          "Name",
+          "description",
+          symbolId,
+          "36.8,47.3 36.7,47.1 36.9,47.2",
+          1260,
+          701,
+          "35.4,46.9,37.3,47.7",
+          new Map(),
+          new Map(),
+          C5Ren.WebRenderer.OUTPUT_FORMAT_GEOJSON
+        );
+        console.log(mission.label, outputGeoJson);
+      })
+    </script>
+  </head>
+  <body></body>
+</html>

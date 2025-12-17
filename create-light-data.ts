@@ -28,6 +28,20 @@ const missions = [
   { prefix: "25", code: "342300", label: "Seize" },
 ];
 
+// workaround for AddVersion10Symbols
+const requiredForMsdToWork = new Set([
+  "120200",
+  "161800",
+  "161800",
+  "161800",
+  "161800",
+  "161800",
+  "161800",
+  "161800",
+  "161800",
+  "161800"
+])
+
 const dataDir = join(__dirname, "src/main/ts/armyc2/c5isr/data");
 const exportDir = join(__dirname, "src/main/ts/armyc2/c5isr/data-light");
 
@@ -43,51 +57,65 @@ type MseData = {
   mse: {
     SYMBOL: Array<MseSymbol>;
   };
+    msd: {
+    SYMBOL: Array<MseSymbol>;
+  };
 };
 
 async function main() {
-  const mseOriginal = JSON.parse(
-    await readFile(join(dataDir, "mse.json"), { encoding: "utf-8" })
-  ) as MseData;
 
-  let ss = "";
-  let e = "";
-  let et = "";
-  let est = "";
+  for (const version of ["msd", "mse"]) {
 
-  const symbols: MseSymbol[] = [];
-
-  for (const JSONSymbol of mseOriginal.mse.SYMBOL) {
-    if (JSONSymbol.ss !== "") ss = JSONSymbol.ss;
-    if (JSONSymbol.e !== null && JSONSymbol.e !== "") {
-      e = JSONSymbol.e;
-      et = "";
-      est = "";
+    const originalContent = JSON.parse(
+      await readFile(join(dataDir, `${version}.json`), { encoding: "utf-8" })
+    ) as MseData;
+  
+    let ss = "";
+    let e = "";
+    let et = "";
+    let est = "";
+  
+    const symbols: MseSymbol[] = [];
+  
+    for (const JSONSymbol of originalContent[version as "mse"|"msd"].SYMBOL) {
+      if (JSONSymbol.ss !== "") ss = JSONSymbol.ss;
+      if (JSONSymbol.e !== null && JSONSymbol.e !== "") {
+        e = JSONSymbol.e;
+        et = "";
+        est = "";
+      }
+      if (JSONSymbol.et !== null && JSONSymbol.et !== "") {
+        et = JSONSymbol.et;
+        est = "";
+      }
+      if (!!missions.find((mission) => {
+        if (version === "msd") {
+          return requiredForMsdToWork.has(JSONSymbol.code);
+        } else {
+          return mission.code === JSONSymbol.code
+        }
+      })) {
+        symbols.push({
+          ...JSONSymbol,
+          ss,
+          e,
+          et,
+          est,
+        });
+      }
     }
-    if (JSONSymbol.et !== null && JSONSymbol.et !== "") {
-      et = JSONSymbol.et;
-      est = "";
-    }
-    if (!!missions.find((mission) => mission.code === JSONSymbol.code)) {
-      symbols.push({
-        ...JSONSymbol,
-        ss,
-        e,
-        et,
-        est,
-      });
-    }
+  
+    const output = {
+      [version]: {
+        SYMBOL: symbols,
+      },
+    };
+  
+    await writeFile(join(exportDir, `${version}.json`), JSON.stringify(output), {
+      encoding: "utf-8",
+    });
   }
 
-  const mseLight: MseData = {
-    mse: {
-      SYMBOL: symbols,
-    },
-  };
-
-  await writeFile(join(exportDir, "mse.json"), JSON.stringify(mseLight), {
-    encoding: "utf-8",
-  });
 }
 
 main();

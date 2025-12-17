@@ -1,5 +1,1 @@
-{
-  "msd": {
-    "SYMBOL": []
-  }
-}
+{"msd":{"SYMBOL":[{"ss":"01","e":"Civilian","et":"Rotary Wing","est":"","code":"120200"},{"ss":"05","e":"Civilian","et":"Capsule","est":"","code":"120200"},{"ss":"10","e":"Movement and Maneuver","et":"Air Traffic Services/Airfield Operations","est":"","code":"120200"},{"ss":"10","e":"Sustainment","et":"NATO Supply Class I","est":"","code":"161800"},{"ss":"15","e":"Vehicle","et":"Tank","est":"","code":"120200"},{"ss":"20","e":"Infrastructure","et":"Banking Finance and Insurance Infrastructure","est":"","code":"120200"},{"ss":"25","e":"Command and Control Areas","et":"Named Area of Interest","est":"","code":"120200","geometry":"Area","drawRules":"Area1","modifiers":"T"},{"ss":"30","e":"Military Combatant","et":"Surface Combatant, Line","est":"","code":"120200"},{"ss":"35","e":"Civilian","et":"Autonomous Underwater Vehicle (AUV)/ Unmanned Underwater Vehicle (UUV)","est":"","code":"120200"},{"ss":"45","e":"Turbulence","et":"Moderate","est":"","code":"120200","geometry":"Point","drawRules":"Point3","modifiers":"0000FF"},{"ss":"45","e":"Weather Symbols","et":"Haze","est":"","code":"161800","geometry":"Point","drawRules":"Point7","modifiers":"AE6C4E"},{"ss":"46","e":"Hydrography","et":"Coastal Hydrography","est":"","code":"120200","geometry":"","drawRules":"","modifiers":""}]}}
