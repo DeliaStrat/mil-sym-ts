@@ -4,37 +4,41 @@
     <script src="./dist/C5Ren.umd.js" type="text/javascript"></script>
     <script type="text/javascript">
       const missions = [
-        // { code: "25270501 25340100", label: "Block" },
-        // { code: "25270503 25341100", label: "Fix" },
+        // offensive
         { prefix: "25", code: "141700", label: "Ambush" },
-        { prefix: "25", code: "151204", label: "Contain" },
-        { prefix: "25", code: "151205", label: "Retain" },
         { prefix: "25", code: "151403", label: "Axis of Advance" },
         { prefix: "25", code: "152000", label: "Attack by fire position" },
-        { prefix: "25", code: "152600", label: "Area Defense" },
-        { prefix: "25", code: "152800", label: "Mobile Defense" },
-        { prefix: "25", code: "270501", label: "Block" },
-        { prefix: "25", code: "270502", label: "Disrupt" },
-        { prefix: "25", code: "270503", label: "Fix" },
-        { prefix: "25", code: "270602", label: "Difficult" },
+        { prefix: "25", code: "270602", label: "Bypass (Difficult)" },
         { prefix: "25", code: "340200", label: "Breach" },
-        { prefix: "25", code: "340300", label: "Bypass" },
-        { prefix: "25", code: "340400", label: "Canalize" },
         { prefix: "25", code: "340500", label: "Clear" },
         { prefix: "25", code: "340600", label: "Counter Attack" },
-        { prefix: "25", code: "340700", label: "CATK By Fire" },
-        { prefix: "25", code: "340800", label: "Delay" },
-        { prefix: "25", code: "340900", label: "Destroy" },
-        { prefix: "25", code: "341400", label: "Interdict" },
+        { prefix: "25", code: "341100", label: "Fix" },
+        { prefix: "25", code: "341300", label: "Follow and Support" },
+        { prefix: "25", code: "342300", label: "Seize" },
+        { prefix: "25", code: "342700", label: "Cordon and Search" },
         { prefix: "25", code: "341500", label: "Isolate" },
-        { prefix: "25", code: "341600", label: "Neutralize" },
-        { prefix: "25", code: "341700", label: "Occupy" },
         { prefix: "25", code: "342100", label: "Secure" },
+        // defensive
+        { prefix: "25", code: "151204", label: "Contain" },
+        { prefix: "25", code: "151205", label: "Retain" },
+        { prefix: "25", code: "340800", label: "Delay" },
         { prefix: "25", code: "342201", label: "Cover" },
         { prefix: "25", code: "342202", label: "Guard" },
         { prefix: "25", code: "342203", label: "Screen" },
-        { prefix: "25", code: "342300", label: "Seize" },
-        { prefix: "25", code: "342900", label: "Advance to contact" },
+        { prefix: "25", code: "341700", label: "Occupy" },
+        // tac arrows
+        { prefix: "25", code: "140603", label: "Friendly Supporting Attack" },
+        { prefix: "25", code: "290700", label: "Ferry" },
+        // tac lines
+        { prefix: "25", code: "290100", label: "Obstacle Line" },
+        { prefix: "25", code: "290101", label: "Mineline" },
+        { prefix: "25", code: "290204", label: "Antitank Wall" },
+        { prefix: "25", code: "290301", label: "Unspecified Wire" },
+        { prefix: "25", code: "290302", label: "Single Fence Wire" },
+        { prefix: "25", code: "290900", label: "Fortified Line" },
+        { prefix: "25", code: "271100", label: "Bridge or Gap" },
+        { prefix: "25", code: "110100", label: "Lima Boundary" },
+        { prefix: "25", code: "330300", label: "Main Supply Route" },
       ];
 
       function buildSymbolID(basicID) {
@@ -63,7 +67,8 @@
       }
 
       missions.forEach((mission) => {
-        const symbolId = buildSymbolID(`${mission.prefix}${mission.code}`);
+        const basicSymbolID = `${mission.prefix}${mission.code}`
+        const symbolId = buildSymbolID(basicSymbolID);
         const outputGeoJson = C5Ren.WebRenderer.RenderSymbol2D(
           "ID",
           "Name",
@@ -78,9 +83,30 @@
           C5Ren.WebRenderer.OUTPUT_FORMAT_GEOJSON
         );
         if (JSON.parse(outputGeoJson).type === "error") {
-          console.error(mission.label, outputGeoJson);
+          console.error(mission.label, basicSymbolID , "KO");
         } else {
-          // console.log(mission.label, outputGeoJson);
+          console.log(mission.label, basicSymbolID, "OK");
+        }
+
+        const attributes = new Map();
+
+        // seems not to work as expected, see workaround bellow
+        // attributes.set(MilStdAttributes.LineWidth, strokeWidth.toString());
+
+        // #FEDCBA is a random value as workaround because mil-sym-ts doesn't allow the currentColor
+        // as value, see workaround with replace bellow
+        // PR is more than welcome
+        attributes.set(C5Ren.MilStdAttributes.LineColor, "#FEDCBA");
+        attributes.set(C5Ren.MilStdAttributes.PixelSize, "50");
+        attributes.set(C5Ren.MilStdAttributes.DrawAsIcon, "true");
+        C5Ren.RendererSettings.getInstance().setScaleMainIcon(false);
+
+        const si = C5Ren.MilStdIconRenderer.getInstance().RenderSVG(symbolId, new Map(), attributes);
+
+        if (!si) {
+          console.error(mission.label, basicSymbolID , "svg KO");
+        } else {
+          console.log(mission.label, basicSymbolID, "svg OK", si.getSVG());
         }
       })
     </script>

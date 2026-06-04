@@ -1,38 +1,43 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+
 const missions = [
-  // { code: "25270501 25340100", label: "Block" },
-  // { code: "25270503 25341100", label: "Fix" },
+  // offensive
   { prefix: "25", code: "141700", label: "Ambush" },
-  { prefix: "25", code: "151204", label: "Contain" },
-  { prefix: "25", code: "151205", label: "Retain" },
   { prefix: "25", code: "151403", label: "Axis of Advance" },
   { prefix: "25", code: "152000", label: "Attack by fire position" },
-  { prefix: "25", code: "152600", label: "Area Defense" },
-  { prefix: "25", code: "152800", label: "Mobile Defense" },
-  { prefix: "25", code: "270501", label: "Block" },
-  { prefix: "25", code: "270502", label: "Disrupt" },
-  { prefix: "25", code: "270503", label: "Fix" },
-  { prefix: "25", code: "270602", label: "Difficult" },
+  { prefix: "25", code: "270602", label: "Bypass (Difficult)" },
   { prefix: "25", code: "340200", label: "Breach" },
-  { prefix: "25", code: "340300", label: "Bypass" },
-  { prefix: "25", code: "340400", label: "Canalize" },
   { prefix: "25", code: "340500", label: "Clear" },
   { prefix: "25", code: "340600", label: "Counter Attack" },
-  { prefix: "25", code: "340700", label: "CATK By Fire" },
-  { prefix: "25", code: "340800", label: "Delay" },
-  { prefix: "25", code: "340900", label: "Destroy" }, //
-  { prefix: "25", code: "341400", label: "Interdict" }, //
+  { prefix: "25", code: "341100", label: "Fix" },
+  { prefix: "25", code: "341300", label: "Follow and Support" },
+  { prefix: "25", code: "342300", label: "Seize" },
+  { prefix: "25", code: "342700", label: "Cordon and Search" },
   { prefix: "25", code: "341500", label: "Isolate" },
-  { prefix: "25", code: "341600", label: "Neutralize" }, //
-  { prefix: "25", code: "341700", label: "Occupy" },
   { prefix: "25", code: "342100", label: "Secure" },
+  // defensive
+  { prefix: "25", code: "151204", label: "Contain" },
+  { prefix: "25", code: "151205", label: "Retain" },
+  { prefix: "25", code: "340800", label: "Delay" },
   { prefix: "25", code: "342201", label: "Cover" },
   { prefix: "25", code: "342202", label: "Guard" },
   { prefix: "25", code: "342203", label: "Screen" },
-  { prefix: "25", code: "342300", label: "Seize" },
-  { prefix: "25", code: "342900", label: "Advance to contact" },
+  { prefix: "25", code: "341700", label: "Occupy" },
+  // tac arrows
+  { prefix: "25", code: "140603", label: "Friendly Supporting Attack" },
+  { prefix: "25", code: "290700", label: "Ferry" },
+  // tac lines
+  { prefix: "25", code: "290100", label: "Obstacle Line" },
+  { prefix: "25", code: "290101", label: "Mineline" },
+  { prefix: "25", code: "290204", label: "Antitank Wall" },
+  { prefix: "25", code: "290301", label: "Unspecified Wire" },
+  { prefix: "25", code: "290302", label: "Single Fence Wire" },
+  { prefix: "25", code: "290900", label: "Fortified Line" },
+  { prefix: "25", code: "271100", label: "Bridge or Gap" },
+  { prefix: "25", code: "110100", label: "Lima Boundary" },
+  { prefix: "25", code: "330300", label: "Main Supply Route" },
 ];
 
 // workaround for AddVersion10Symbols
@@ -69,7 +74,32 @@ type MseData = {
   };
 };
 
+type SvgElement = {
+  id: string;
+  X: string;
+  Y: string;
+  Width: string;
+  Height: string;
+  SVG: string;
+};
+
 async function main() {
+
+  const missionIDs = new Set(missions.map((m) => `${m.prefix}${m.code}`));
+
+  const svgdContent = JSON.parse(
+    await readFile(join(dataDir, "svgd.json"), { encoding: "utf-8" })
+  ) as { svgdata: { SVGElements: SvgElement[] } };
+
+  const filteredSvgElements = svgdContent.svgdata.SVGElements.filter((el) =>
+    missionIDs.has(el.id)
+  );
+
+  await writeFile(
+    join(exportDir, "svgd.json"),
+    JSON.stringify({ svgdata: { SVGElements: filteredSvgElements } }),
+    { encoding: "utf-8" }
+  );
 
   for (const version of ["msd", "mse"]) {
 
@@ -97,7 +127,7 @@ async function main() {
       }
       if (!!missions.find((mission) => {
         if (version === "msd") {
-          return requiredForMsdToWork.has(JSONSymbol.code);
+          return requiredForMsdToWork.has(JSONSymbol.code) || mission.code === JSONSymbol.code;
         } else {
           return mission.code === JSONSymbol.code
         }
