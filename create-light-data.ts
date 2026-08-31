@@ -25,6 +25,7 @@ const missions = [
   { prefix: "25", code: "342202", label: "Guard" },
   { prefix: "25", code: "342203", label: "Screen" },
   { prefix: "25", code: "341700", label: "Occupy" },
+  { prefix: "25", code: "152600", label: "Area Defense"},
   // tac arrows
   { prefix: "25", code: "140603", label: "Friendly Supporting Attack" },
   { prefix: "25", code: "290700", label: "Ferry" },
@@ -88,15 +89,18 @@ async function main() {
   const missionIDs = new Set(missions.map((m) => `${m.prefix}${m.code}`));
 
   const svgdContent = JSON.parse(
-    await readFile(join(dataDir, "svgd.json"), { encoding: "utf-8" })
+    await readFile(join(dataDir, "svge.json"), { encoding: "utf-8" })
   ) as { svgdata: { SVGElements: SvgElement[] } };
+
+  // needed for Mineline 25290101
+  missionIDs.add("25131")
 
   const filteredSvgElements = svgdContent.svgdata.SVGElements.filter((el) =>
     missionIDs.has(el.id)
   );
 
   await writeFile(
-    join(exportDir, "svgd.json"),
+    join(exportDir, "svge.json"),
     JSON.stringify({ svgdata: { SVGElements: filteredSvgElements } }),
     { encoding: "utf-8" }
   );
