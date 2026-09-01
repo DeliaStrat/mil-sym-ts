@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./dist/C5Ren.umd.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      const missions = [
+        // offensive
+        { prefix: "25", code: "141700", label: "Ambush" },
+        { prefix: "25", code: "151403", label: "Axis of Advance" },
+        { prefix: "25", code: "152000", label: "Attack by fire position" },
+        { prefix: "25", code: "270602", label: "Bypass (Difficult)" },
+        { prefix: "25", code: "340200", label: "Breach" },
+        { prefix: "25", code: "340500", label: "Clear" },
+        { prefix: "25", code: "340600", label: "Counter Attack" },
+        { prefix: "25", code: "341100", label: "Fix" },
+        { prefix: "25", code: "341300", label: "Follow and Support" },
+        { prefix: "25", code: "342300", label: "Seize" },
+        { prefix: "25", code: "342700", label: "Cordon and Search" },
+        { prefix: "25", code: "341500", label: "Isolate" },
+        { prefix: "25", code: "342100", label: "Secure" },
+        // defensive
+        { prefix: "25", code: "151204", label: "Contain" },
+        { prefix: "25", code: "151205", label: "Retain" },
+        { prefix: "25", code: "340800", label: "Delay" },
+        { prefix: "25", code: "342201", label: "Cover" },
+        { prefix: "25", code: "342202", label: "Guard" },
+        { prefix: "25", code: "342203", label: "Screen" },
+        { prefix: "25", code: "341700", label: "Occupy" },
+        { prefix: "25", code: "152600", label: "Area Defense"},
+        // tac arrows
+        { prefix: "25", code: "140603", label: "Friendly Supporting Attack" },
+        { prefix: "25", code: "290700", label: "Ferry" },
+        
+        // tac lines
+        { prefix: "25", code: "290100", label: "Obstacle Line" },
+        { prefix: "25", code: "290101", label: "Mineline" },
+        { prefix: "25", code: "290204", label: "Antitank Wall" },
+        { prefix: "25", code: "290301", label: "Unspecified Wire" },
+        { prefix: "25", code: "290302", label: "Single Fence Wire" },
+        { prefix: "25", code: "290900", label: "Fortified Line" },
+        { prefix: "25", code: "271100", label: "Bridge or Gap" },
+        { prefix: "25", code: "110100", label: "Lima Boundary" },
+        { prefix: "25", code: "330300", label: "Main Supply Route" },
+        { prefix: "25", code: "140200", label: "Line of contact" },
+      ];
+
+      function buildSymbolID(basicID) {
+        const version = 13;
+        const context = "0"; // 0-reality
+        const affiliation = "3"; // 3-friendly
+        const basicIdPrefix = basicID.substring(0, 2);
+        const status = "0"; // 0-present
+        const hqtfd = "0"; // 0-unknown
+        const amp = "00"; // 00-unknown
+        const basicIdSuffix = basicID.substring(2); // 6 chars
+        const s1Mod = "00";
+        const s2Mod = "00";
+
+        // extra --------
+        const lbS1 = "0";
+        const lbS2 = "0";
+        // 2525E has frame shape and 4 reserved positions
+        // 2525D has 5 reserved positions
+        const frame = version >= 13 ? "0" + "0000" : "00000";
+        const labels = "000";
+
+        const id = `${version}${context}${affiliation}${basicIdPrefix}${status}${hqtfd}${amp}${basicIdSuffix}${s1Mod}${s2Mod}${lbS1}${lbS2}${frame}${labels}`;
+
+        return id;
+      }
+
+      missions.forEach((mission) => {
+        const basicSymbolID = `${mission.prefix}${mission.code}`
+        const symbolId = buildSymbolID(basicSymbolID);
+
+        const infos = C5Ren.MSLookup.getInstance().getMSLInfo(symbolId);
+        if (infos) {
+          console.log(`${symbolId} infos`, "OK");
+        }else {
+          console.log(`${symbolId} infos`, "KO");
+        }
+
+        const outputGeoJson = C5Ren.WebRenderer.RenderSymbol2D(
+          "ID",
+          "Name",
+          "description",
+          symbolId,
+          "36.8,47.3 36.7,47.1 36.9,47.2 37.0,47.3",
+          1260,
+          701,
+          "35.4,46.9,37.3,47.7",
+          new Map(),
+          new Map(),
+          C5Ren.WebRenderer.OUTPUT_FORMAT_GEOJSON
+        );
+        if (JSON.parse(outputGeoJson).type === "error") {
+          console.error(mission.label, basicSymbolID , "KO");
+        } else {
+          console.log(mission.label, basicSymbolID, "OK");
+        }
+
+        const attributes = new Map();
+
+        // seems not to work as expected, see workaround bellow
+        // attributes.set(MilStdAttributes.LineWidth, strokeWidth.toString());
+
+        // #FEDCBA is a random value as workaround because mil-sym-ts doesn't allow the currentColor
+        // as value, see workaround with replace bellow
+        // PR is more than welcome
+        attributes.set(C5Ren.MilStdAttributes.LineColor, "#FEDCBA");
+        attributes.set(C5Ren.MilStdAttributes.PixelSize, "50");
+        attributes.set(C5Ren.MilStdAttributes.DrawAsIcon, "true");
+        C5Ren.RendererSettings.getInstance().setScaleMainIcon(false);
+
+        const si = C5Ren.MilStdIconRenderer.getInstance().RenderSVG(symbolId, new Map(), attributes);
+
+        if (!si) {
+          console.error(mission.label, basicSymbolID , "svg KO");
+        } else {
+          console.log(mission.label, basicSymbolID, "svg OK", si.getSVG());
+        }
+      })
+    </script>
+  </head>
+  <body></body>
+</html>

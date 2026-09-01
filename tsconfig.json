@@ -38,6 +38,7 @@
     "incremental": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "types": ["node"]
   },
     //"include": ["./src/**/*"],
   "exclude": [
