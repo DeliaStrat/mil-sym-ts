@@ -40,6 +40,9 @@ const missions = [
   { prefix: "25", code: "110100", label: "Lima Boundary" },
   { prefix: "25", code: "330300", label: "Main Supply Route" },
   { prefix: "25", code: "140200", label: "Line of contact" },
+
+  { prefix: "25", code: "120100", label: "Area of op frd" },
+  { prefix: "25", code: "270707", label: "Minefield" },
 ];
 
 // workaround for AddVersion10Symbols
